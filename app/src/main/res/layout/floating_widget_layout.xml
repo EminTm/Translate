@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- ۱. حباب کوچک شناور (وقتی بسته است) -->
+    <LinearLayout
+        android:id="@+id/layout_collapsed"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="#2196F3"
+        android:gravity="center"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TR"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- ۲. پنجره باز شده مینیاتوری (موقع ترجمه) -->
+    <LinearLayout
+        android:id="@+id/layout_expanded"
+        android:layout_width="310dp"
+        android:layout_height="wrap_content"
+        android:background="#EEFFFFFF"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:elevation="8dp"
+        android:visibility="gone">
+
+        <!-- دکمه بستن پنجره -->
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="end"
+            android:text="✕"
+            android:textSize="12sp" />
+
+        <!-- کادر تایپ یا کپی متن -->
+        <EditText
+            android:id="@+id/etInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="متن انگلیسی یا دیالوگ فیلم..."
+            android:textSize="14sp"
+            android:maxLines="3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnTranslate"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="ترجمه متن"
+                android:textSize="12sp" />
+
+            <!-- دکمه میکروفون برای شنیدن صدای فیلم -->
+            <Button
+                android:id="@+id/btnMic"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:backgroundTint="#E91E63"
+                android:text="🎙 شنیدن فیلم"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- نمایش متن ترجمه شده -->
+        <TextView
+            android:id="@+id/tvResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="8dp"
+            android:background="#E0E0E0"
+            android:text="ترجمه فارسی اینجا نمایش داده می‌شود..."
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</FrameLayout>
