@@ -19,20 +19,25 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      # دانلود و نصب اتوماتیک گرادل مناسب اندروید
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.5'
 
-      # بیلد مستقیم فایل نصبی بدون نیاز به فایلهای متفرقه
-      - name: Build APK
-        env:
-          ANDROID_HOME: /usr/local/lib/android/sdk
-        run: gradle assembleDebug --stacktrace
+      # ۱. تنظیم آدرس SDK و تایید اتوماتیک تمامی مجوزهای اندروید
+      - name: Accept Android Licenses & Setup
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      # آماده کردن فایل دانلودی
+      # ۲. بیلد برنامه و چاپ خلاصه‌ی تمیز خطا در صورت وجود مشکل
+      - name: Build APK
+        run: |
+          gradle assembleDebug --no-daemon
+
+      # ۳. دانلود فایل APK آماده
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Floating-Translator-APK
