@@ -24,20 +24,27 @@ jobs:
         with:
           gradle-version: '8.5'
 
-      # ۱. تنظیم آدرس SDK و تایید اتوماتیک تمامی مجوزهای اندروید
-      - name: Accept Android Licenses & Setup
+      # اصلاح خودکار تم و فایل‌های تنظیمات
+      - name: Auto Fix Config & Licenses
         run: |
           echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "android.useAndroidX=true" > gradle.properties
+          sed -i 's/Theme.Material3.DayNight.NoActionBar/Theme.MaterialComponents.DayNight.NoActionBar/g' app/src/main/AndroidManifest.xml || true
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      # ۲. بیلد برنامه و چاپ خلاصه‌ی تمیز خطا در صورت وجود مشکل
+      # بررسی درستی مسیر فایل‌ها
+      - name: Verify Project Files
+        run: |
+          echo "Checking files in app folder:"
+          find app -type f
+
+      # بیلد تمیز و بدون خطای برنامه
       - name: Build APK
         run: |
-          gradle assembleDebug --no-daemon
+          gradle assembleDebug --console=plain --no-daemon
 
-      # ۳. دانلود فایل APK آماده
+      # آپلود فایل دانلودی
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Floating-Translator-APK
