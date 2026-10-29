@@ -72,10 +72,10 @@ jobs:
               compileSdk 34
               defaultConfig {
                   applicationId "com.example.translator"
-                  minSdk 24
+                  minSdk 29
                   targetSdk 34
-                  versionCode 7
-                  versionName "7.0-FloatingPro"
+                  versionCode 9
+                  versionName "9.0-Android10Plus"
               }
               buildTypes {
                   release {
@@ -86,8 +86,8 @@ jobs:
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
-              kotlin {
-                  jvmToolchain(17)
+              kotlinOptions {
+                  jvmTarget = '17'
               }
           }
           dependencies {
@@ -113,6 +113,14 @@ jobs:
                   <item name="colorOnPrimary">#003258</item>
                   <item name="android:statusBarColor">#0F1015</item>
                   <item name="android:navigationBarColor">#0F1015</item>
+              </style>
+              <style name="Theme.Transparent" parent="Theme.AppCompat.Light.NoActionBar">
+                  <item name="android:windowIsTranslucent">true</item>
+                  <item name="android:windowBackground">@android:color/transparent</item>
+                  <item name="android:windowContentOverlay">@null</item>
+                  <item name="android:windowNoTitle">true</item>
+                  <item name="android:windowIsFloating">true</item>
+                  <item name="android:backgroundDimEnabled">false</item>
               </style>
           </resources>
           EOF
@@ -224,18 +232,6 @@ jobs:
                       android:textColor="#E2E2E6"
                       android:textSize="19sp"
                       android:textStyle="bold" />
-
-                  <TextView
-                      android:id="@+id/btnSettingsKey"
-                      android:layout_width="38dp"
-                      android:layout_height="38dp"
-                      android:layout_alignParentEnd="true"
-                      android:layout_centerVertical="true"
-                      android:background="@drawable/bg_circle_button"
-                      android:gravity="center"
-                      android:text="⚙"
-                      android:textColor="#A8C7FA"
-                      android:textSize="18sp" />
               </RelativeLayout>
 
               <ScrollView
@@ -265,21 +261,44 @@ jobs:
                           android:textSize="22sp" />
 
                       <LinearLayout
-                          android:id="@+id/btnPasteChip"
-                          android:layout_width="wrap_content"
-                          android:layout_height="38dp"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
                           android:layout_marginTop="6dp"
-                          android:background="@drawable/bg_chip"
-                          android:gravity="center_vertical"
-                          android:paddingHorizontal="16dp">
+                          android:orientation="horizontal">
 
-                          <TextView
+                          <LinearLayout
+                              android:id="@+id/btnPasteChip"
                               android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="📋  Paste"
-                              android:textColor="#E2E2E6"
-                              android:textSize="14sp"
-                              android:textStyle="bold" />
+                              android:layout_height="38dp"
+                              android:background="@drawable/bg_chip"
+                              android:gravity="center_vertical"
+                              android:paddingHorizontal="16dp">
+
+                              <TextView
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:text="📋  Paste"
+                                  android:textColor="#E2E2E6"
+                                  android:textSize="14sp"
+                                  android:textStyle="bold" />
+                          </LinearLayout>
+
+                          <LinearLayout
+                              android:id="@+id/btnClearChip"
+                              android:layout_width="wrap_content"
+                              android:layout_height="38dp"
+                              android:layout_marginStart="8dp"
+                              android:background="@drawable/bg_chip"
+                              android:gravity="center_vertical"
+                              android:paddingHorizontal="16dp">
+
+                              <TextView
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:text="✕  پاک کردن"
+                                  android:textColor="#9AA0A6"
+                                  android:textSize="14sp" />
+                          </LinearLayout>
                       </LinearLayout>
 
                       <LinearLayout
@@ -401,7 +420,7 @@ jobs:
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:layout_marginTop="6dp"
-                              android:text="شناور"
+                              android:text="پنجره شناور"
                               android:textColor="#A0A4AE"
                               android:textSize="12sp" />
                       </LinearLayout>
@@ -421,37 +440,16 @@ jobs:
                               android:textSize="28sp" />
                       </LinearLayout>
 
-                      <LinearLayout
-                          android:id="@+id/btnInternalAudio"
+                      <View
                           android:layout_width="0dp"
                           android:layout_weight="1"
-                          android:layout_height="wrap_content"
-                          android:gravity="center"
-                          android:orientation="vertical">
-
-                          <TextView
-                              android:layout_width="56dp"
-                              android:layout_height="56dp"
-                              android:background="@drawable/bg_circle_button"
-                              android:gravity="center"
-                              android:text="🔊"
-                              android:textSize="22sp" />
-
-                          <TextView
-                              android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:layout_marginTop="6dp"
-                              android:text="صدای فیلم"
-                              android:textColor="#A0A4AE"
-                              android:textSize="12sp" />
-                      </LinearLayout>
-
+                          android:layout_height="1dp" />
                   </LinearLayout>
               </LinearLayout>
           </RelativeLayout>
           EOF
 
-          # floating_widget_layout.xml (مجهز به نوار انتخاب زبان و دکمه تعویض)
+          # floating_widget_layout.xml
           cat << 'EOF' > app/src/main/res/layout/floating_widget_layout.xml
           <?xml version="1.0" encoding="utf-8"?>
           <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -521,7 +519,7 @@ jobs:
                           android:textSize="15sp" />
                   </LinearLayout>
 
-                  <!-- نوار انتخاب زبان اختصاصی پنجره شناور -->
+                  <!-- Language Bar -->
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="36dp"
@@ -563,7 +561,7 @@ jobs:
                           android:textStyle="bold" />
                   </LinearLayout>
 
-                  <!-- ورودی و دکمه‌ها -->
+                  <!-- Input & Buttons -->
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -610,7 +608,7 @@ jobs:
                       </LinearLayout>
                   </LinearLayout>
 
-                  <!-- بخش خروجی به همراه اسپیکر و کپی سریع -->
+                  <!-- Results -->
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -665,11 +663,10 @@ jobs:
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
               <uses-permission android:name="android.permission.RECORD_AUDIO" />
-              <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
               <uses-permission android:name="android.permission.INTERNET" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
               <queries>
                   <intent>
@@ -687,6 +684,7 @@ jobs:
                   android:roundIcon="@drawable/ic_app_icon"
                   android:supportsRtl="false"
                   android:theme="@style/Theme.EminTranslate">
+
                   <activity
                       android:name=".MainActivity"
                       android:exported="true"
@@ -696,11 +694,21 @@ jobs:
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
                   </activity>
+
+                  <activity
+                      android:name=".VoiceInputActivity"
+                      android:exported="false"
+                      android:theme="@style/Theme.Transparent" />
+
                   <service
                       android:name=".FloatingWidgetService"
                       android:enabled="true"
                       android:exported="false"
-                      android:foregroundServiceType="microphone|mediaProjection" />
+                      android:foregroundServiceType="specialUse">
+                      <property
+                          android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                          android:value="Floating translator window overlay" />
+                  </service>
               </application>
           </manifest>
           EOF
@@ -709,11 +717,9 @@ jobs:
           cat << 'EOF' > app/src/main/java/com/example/translator/TranslatorHelper.kt
           package com.example.translator
 
-          import android.util.Base64
           import kotlinx.coroutines.Dispatchers
           import kotlinx.coroutines.withContext
           import org.json.JSONArray
-          import org.json.JSONObject
           import java.net.HttpURLConnection
           import java.net.URL
           import java.net.URLEncoder
@@ -734,12 +740,18 @@ jobs:
 
                           val response = conn.inputStream.bufferedReader().use { it.readText() }
                           val jsonArray = JSONArray(response)
-                          val sentences = jsonArray.getJSONArray(0)
+                          val sentences = jsonArray.optJSONArray(0)
                           val result = StringBuilder()
-                          for (i in 0 until sentences.length()) {
-                              result.append(sentences.getJSONArray(i).getString(0))
+                          if (sentences != null) {
+                              for (i in 0 until sentences.length()) {
+                                  val item = sentences.optJSONArray(i)
+                                  if (item != null) {
+                                      result.append(item.optString(0, ""))
+                                  }
+                              }
                           }
-                          result.toString()
+                          val finalStr = result.toString().trim()
+                          if (finalStr.isNotEmpty()) finalStr else "پاسخی یافت نشد"
                       } catch (e: Exception) {
                           "خطا در ترجمه: ${e.localizedMessage}"
                       } finally {
@@ -747,96 +759,63 @@ jobs:
                       }
                   }
               }
+          }
+          EOF
 
-              suspend fun transcribeAndTranslateInternalAudio(wavBytes: ByteArray, targetLang: String, apiKey: String): String {
-                  return withContext(Dispatchers.IO) {
-                      var conn: HttpURLConnection? = null
+          # VoiceInputActivity.kt
+          cat << 'EOF' > app/src/main/java/com/example/translator/VoiceInputActivity.kt
+          package com.example.translator
+
+          import android.content.Intent
+          import android.os.Bundle
+          import android.speech.RecognizerIntent
+          import androidx.activity.result.contract.ActivityResultContracts
+          import androidx.appcompat.app.AppCompatActivity
+
+          class VoiceInputActivity : AppCompatActivity() {
+
+              private val speechLauncher = registerForActivityResult(
+                  ActivityResultContracts.StartActivityForResult()
+              ) { result ->
+                  if (result.resultCode == RESULT_OK && result.data != null) {
+                      val spoken = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.getOrNull(0) ?: ""
+                      if (spoken.isNotBlank()) {
+                          val serviceIntent = Intent(this, FloatingWidgetService::class.java).apply {
+                              action = FloatingWidgetService.ACTION_VOICE_RESULT
+                              putExtra(FloatingWidgetService.EXTRA_VOICE_TEXT, spoken)
+                          }
+                          startForegroundService(serviceIntent)
+                      }
+                  }
+                  finish()
+                  overridePendingTransition(0, 0)
+              }
+
+              override fun onCreate(savedInstanceState: Bundle?) {
+                  super.onCreate(savedInstanceState)
+
+                  if (savedInstanceState == null) {
+                      val langCode = intent.getStringExtra(EXTRA_LANG_CODE) ?: "tr"
+                      val speechIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                          putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                          putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCode)
+                          putExtra(RecognizerIntent.EXTRA_PROMPT, "در حال شنیدن گفتار...")
+                      }
                       try {
-                          val base64Audio = Base64.encodeToString(wavBytes, Base64.NO_WRAP)
-                          val prompt = "Transcribe the spoken audio precisely and translate it completely into $targetLang. Output the transcription and translation clearly."
-
-                          val url = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey")
-                          conn = url.openConnection() as HttpURLConnection
-                          conn.requestMethod = "POST"
-                          conn.connectTimeout = 25000
-                          conn.readTimeout = 30000
-                          conn.setRequestProperty("Content-Type", "application/json")
-                          conn.doOutput = true
-
-                          val root = JSONObject().apply {
-                              put("contents", JSONArray().apply {
-                                  put(JSONObject().apply {
-                                      put("parts", JSONArray().apply {
-                                          put(JSONObject().apply { put("text", prompt) })
-                                          put(JSONObject().apply {
-                                              put("inline_data", JSONObject().apply {
-                                                  put("mime_type", "audio/wav")
-                                                  put("data", base64Audio)
-                                              })
-                                          })
-                                      })
-                                  })
-                              })
-                          }
-
-                          conn.outputStream.use { it.write(root.toString().toByteArray(Charsets.UTF_8)) }
-
-                          if (conn.responseCode == 200) {
-                              val response = conn.inputStream.bufferedReader().use { it.readText() }
-                              val json = JSONObject(response)
-                              json.getJSONArray("candidates")
-                                  .getJSONObject(0)
-                                  .getJSONObject("content")
-                                  .getJSONArray("parts")
-                                  .getJSONObject(0)
-                                  .getString("text").trim()
-                          } else {
-                              "خطای هوش مصنوعی (${conn.responseCode}): کلید را بررسی کنید."
-                          }
+                          speechLauncher.launch(speechIntent)
                       } catch (e: Exception) {
-                          "خطا در پردازش صدا: ${e.localizedMessage}"
-                      } finally {
-                          conn?.disconnect()
+                          finish()
                       }
                   }
               }
 
-              fun pcmToWav(pcmData: ByteArray, sampleRate: Int = 16000, channels: Int = 1): ByteArray {
-                  val totalAudioLen = pcmData.size
-                  val totalDataLen = totalAudioLen + 36
-                  val byteRate = sampleRate * channels * 2
-                  val header = ByteArray(44)
-                  header[0] = 'R'.code.toByte(); header[1] = 'I'.code.toByte(); header[2] = 'F'.code.toByte(); header[3] = 'F'.code.toByte()
-                  header[4] = (totalDataLen and 0xff).toByte()
-                  header[5] = ((totalDataLen shr 8) and 0xff).toByte()
-                  header[6] = ((totalDataLen shr 16) and 0xff).toByte()
-                  header[7] = ((totalDataLen shr 24) and 0xff).toByte()
-                  header[8] = 'W'.code.toByte(); header[9] = 'A'.code.toByte(); header[10] = 'V'.code.toByte(); header[11] = 'E'.code.toByte()
-                  header[12] = 'f'.code.toByte(); header[13] = 'm'.code.toByte(); header[14] = 't'.code.toByte(); header[15] = ' '.code.toByte()
-                  header[16] = 16; header[17] = 0; header[18] = 0; header[19] = 0
-                  header[20] = 1; header[21] = 0
-                  header[22] = channels.toByte(); header[23] = 0
-                  header[24] = (sampleRate and 0xff).toByte()
-                  header[25] = ((sampleRate shr 8) and 0xff).toByte()
-                  header[26] = ((sampleRate shr 16) and 0xff).toByte()
-                  header[27] = ((sampleRate shr 24) and 0xff).toByte()
-                  header[28] = (byteRate and 0xff).toByte()
-                  header[29] = ((byteRate shr 8) and 0xff).toByte()
-                  header[30] = ((byteRate shr 16) and 0xff).toByte()
-                  header[31] = ((byteRate shr 24) and 0xff).toByte()
-                  header[32] = (channels * 2).toByte(); header[33] = 0
-                  header[34] = 16; header[35] = 0
-                  header[36] = 'd'.code.toByte(); header[37] = 'a'.code.toByte(); header[38] = 't'.code.toByte(); header[39] = 'a'.code.toByte()
-                  header[40] = (totalAudioLen and 0xff).toByte()
-                  header[41] = ((totalAudioLen shr 8) and 0xff).toByte()
-                  header[42] = ((totalAudioLen shr 16) and 0xff).toByte()
-                  header[43] = ((totalAudioLen shr 24) and 0xff).toByte()
-                  return header + pcmData
+              companion object {
+                  const val EXTRA_LANG_CODE = "extra_lang_code"
               }
           }
           EOF
 
-          # FloatingWidgetService.kt (دارای مدیریت کامل زبان، جابه‌جایی، اسپیکر و کپی)
+          # FloatingWidgetService.kt
           cat << 'EOF' > app/src/main/java/com/example/translator/FloatingWidgetService.kt
           package com.example.translator
 
@@ -846,7 +825,6 @@ jobs:
           import android.content.pm.ServiceInfo
           import android.graphics.PixelFormat
           import android.os.*
-          import android.speech.*
           import android.speech.tts.TextToSpeech
           import android.view.*
           import android.widget.*
@@ -860,8 +838,8 @@ jobs:
               private lateinit var windowManager: WindowManager
               private lateinit var floatingView: View
               private lateinit var params: WindowManager.LayoutParams
-              private var speechRecognizer: SpeechRecognizer? = null
               private var textToSpeech: TextToSpeech? = null
+              private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
               private val languages = listOf("Turkish", "Persian", "English", "Arabic", "Russian", "German", "French")
               private val langCodes = mapOf(
@@ -885,7 +863,6 @@ jobs:
 
                   textToSpeech = TextToSpeech(this, this)
 
-                  // بارگذاری آخرین زبان‌های انتخاب‌شده از حافظه مشترک با برنامه اصلی
                   val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
                   sourceLang = prefs.getString("source_lang", "Turkish") ?: "Turkish"
                   targetLang = prefs.getString("target_lang", "Persian") ?: "Persian"
@@ -893,17 +870,11 @@ jobs:
                   windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
                   floatingView = LayoutInflater.from(this).inflate(R.layout.floating_widget_layout, null)
 
-                  val layoutType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                  } else {
-                      @Suppress("DEPRECATION")
-                      WindowManager.LayoutParams.TYPE_PHONE
-                  }
-
+                  // در اندروید 10 به بالا همیشه TYPE_APPLICATION_OVERLAY استفاده می‌شود
                   params = WindowManager.LayoutParams(
                       WindowManager.LayoutParams.WRAP_CONTENT,
                       WindowManager.LayoutParams.WRAP_CONTENT,
-                      layoutType,
+                      WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                       WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                       PixelFormat.TRANSLUCENT
                   ).apply {
@@ -914,6 +885,17 @@ jobs:
 
                   windowManager.addView(floatingView, params)
                   setupFloatingLogic()
+              }
+
+              override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+                  if (intent?.action == ACTION_VOICE_RESULT) {
+                      val text = intent.getStringExtra(EXTRA_VOICE_TEXT) ?: ""
+                      if (text.isNotBlank() && ::etInput.isInitialized) {
+                          etInput.setText(text)
+                          performTranslation(text)
+                      }
+                  }
+                  return START_STICKY
               }
 
               override fun onInit(status: Int) {
@@ -943,7 +925,6 @@ jobs:
                   btnFloatSourceLang.text = sourceLang
                   btnFloatTargetLang.text = targetLang
 
-                  // انتخاب زبان‌ها در پنجره شناور
                   btnFloatSourceLang.setOnClickListener { showFloatingLanguagePicker(true) }
                   btnFloatTargetLang.setOnClickListener { showFloatingLanguagePicker(false) }
 
@@ -1014,34 +995,11 @@ jobs:
                   }
 
                   btnMic.setOnClickListener {
-                      if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-                          tvResult.text = "سرویس تشخیص صوت در دسترس نیست."
-                          return@setOnClickListener
+                      val intent = Intent(this, VoiceInputActivity::class.java).apply {
+                          addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                          putExtra(VoiceInputActivity.EXTRA_LANG_CODE, langCodes[sourceLang] ?: "tr")
                       }
-                      speechRecognizer?.destroy()
-                      speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-                      val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                          putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                          putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCodes[sourceLang] ?: "tr")
-                      }
-                      speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-                          override fun onReadyForSpeech(params: Bundle?) { tvResult.text = "در حال شنیدن ($sourceLang)..." }
-                          override fun onResults(results: Bundle?) {
-                              val text = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0) ?: ""
-                              if (text.isNotEmpty()) {
-                                  etInput.setText(text)
-                                  performTranslation(text)
-                              }
-                          }
-                          override fun onError(error: Int) { tvResult.text = "صدا دریافت نشد ($error)" }
-                          override fun onBeginningOfSpeech() {}
-                          override fun onRmsChanged(rmsdB: Float) {}
-                          override fun onBufferReceived(buffer: ByteArray?) {}
-                          override fun onEndOfSpeech() {}
-                          override fun onPartialResults(partialResults: Bundle?) {}
-                          override fun onEvent(eventType: Int, params: Bundle?) {}
-                      })
-                      speechRecognizer?.startListening(intent)
+                      startActivity(intent)
                   }
 
                   attachDragListener(collapsed)
@@ -1052,14 +1010,14 @@ jobs:
                   tvResult.text = "در حال ترجمه..."
                   val src = langCodes[sourceLang] ?: "auto"
                   val trg = langCodes[targetLang] ?: "fa"
-                  CoroutineScope(Dispatchers.Main).launch {
+                  serviceScope.launch {
                       tvResult.text = TranslatorHelper.translate(text, src, trg)
                   }
               }
 
-              // دیالوگ اختصاصی شناور بدون ایجاد کرش روی ویندوز سیستم
               private fun showFloatingLanguagePicker(isSource: Boolean) {
-                  val builder = AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                  val contextWrapper = android.view.ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
+                  val builder = AlertDialog.Builder(contextWrapper)
                   builder.setTitle(if (isSource) "انتخاب زبان مبدا" else "انتخاب زبان مقصد")
                   builder.setItems(languages.toTypedArray()) { _, which ->
                       if (isSource) {
@@ -1076,12 +1034,7 @@ jobs:
                       if (text.isNotEmpty()) performTranslation(text)
                   }
                   val dialog = builder.create()
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
-                  } else {
-                      @Suppress("DEPRECATION")
-                      dialog.window?.setType(WindowManager.LayoutParams.TYPE_PHONE)
-                  }
+                  dialog.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
                   dialog.show()
               }
 
@@ -1115,10 +1068,9 @@ jobs:
 
               private fun startServiceNotification() {
                   val channelId = "floating_emin_ch"
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      val channel = NotificationChannel(channelId, "Emin Translate Floating", NotificationManager.IMPORTANCE_LOW)
-                      getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
-                  }
+                  val channel = NotificationChannel(channelId, "Emin Translate Floating", NotificationManager.IMPORTANCE_LOW)
+                  getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
+
                   val notification = NotificationCompat.Builder(this, channelId)
                       .setContentTitle("Emin Translate")
                       .setContentText("پنجره شناور فعال است")
@@ -1126,7 +1078,7 @@ jobs:
                       .build()
 
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                      startForeground(1001, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+                      startForeground(1001, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
                   } else {
                       startForeground(1001, notification)
                   }
@@ -1134,12 +1086,17 @@ jobs:
 
               override fun onDestroy() {
                   super.onDestroy()
+                  serviceScope.cancel()
                   textToSpeech?.stop()
                   textToSpeech?.shutdown()
-                  speechRecognizer?.destroy()
                   if (::floatingView.isInitialized) {
                       windowManager.removeView(floatingView)
                   }
+              }
+
+              companion object {
+                  const val ACTION_VOICE_RESULT = "com.example.translator.ACTION_VOICE_RESULT"
+                  const val EXTRA_VOICE_TEXT = "extra_voice_text"
               }
           }
           EOF
@@ -1149,12 +1106,8 @@ jobs:
           package com.example.translator
 
           import android.Manifest
-          import android.annotation.SuppressLint
           import android.content.*
           import android.content.pm.PackageManager
-          import android.media.*
-          import android.media.projection.MediaProjection
-          import android.media.projection.MediaProjectionManager
           import android.net.Uri
           import android.os.*
           import android.provider.Settings
@@ -1167,7 +1120,6 @@ jobs:
           import androidx.appcompat.app.AppCompatActivity
           import androidx.core.content.ContextCompat
           import kotlinx.coroutines.*
-          import java.io.ByteArrayOutputStream
           import java.util.*
 
           class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
@@ -1187,17 +1139,27 @@ jobs:
               private lateinit var btnSourceLang: TextView
               private lateinit var btnTargetLang: TextView
 
-              private var mediaProjectionManager: MediaProjectionManager? = null
               private var textToSpeech: TextToSpeech? = null
               private var speechRecognizer: SpeechRecognizer? = null
 
-              private val requestMicPermissionLauncher = registerForActivityResult(
+              // لانچرهای مجزا جهت جلوگیری از اختلاط اکشن‌ها
+              private val micForMainAppLauncher = registerForActivityResult(
                   ActivityResultContracts.RequestPermission()
               ) { isGranted ->
                   if (isGranted) {
                       startListeningAudio()
                   } else {
-                      Toast.makeText(this, "دسترسی میکروفون رد شد", Toast.LENGTH_SHORT).show()
+                      Toast.makeText(this, "دسترسی میکروفون داده نشد", Toast.LENGTH_SHORT).show()
+                  }
+              }
+
+              private val micForFloatingLauncher = registerForActivityResult(
+                  ActivityResultContracts.RequestPermission()
+              ) { isGranted ->
+                  if (isGranted) {
+                      launchFloatingServiceDirectly()
+                  } else {
+                      Toast.makeText(this, "دسترسی میکروفون برای پنجره شناور داده نشد", Toast.LENGTH_SHORT).show()
                   }
               }
 
@@ -1213,19 +1175,6 @@ jobs:
                   }
               }
 
-              private val screenCaptureLauncher = registerForActivityResult(
-                  ActivityResultContracts.StartActivityForResult()
-              ) { result ->
-                  if (result.resultCode == RESULT_OK && result.data != null) {
-                      val mp = mediaProjectionManager?.getMediaProjection(result.resultCode, result.data!!)
-                      if (mp != null) {
-                          startInternalAudioCapture(mp)
-                      }
-                  } else {
-                      Toast.makeText(this, "دسترسی صدای داخلی رد شد", Toast.LENGTH_SHORT).show()
-                  }
-              }
-
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
                   setContentView(R.layout.activity_main)
@@ -1234,7 +1183,6 @@ jobs:
                   sourceLang = prefs.getString("source_lang", "Turkish") ?: "Turkish"
                   targetLang = prefs.getString("target_lang", "Persian") ?: "Persian"
 
-                  mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
                   textToSpeech = TextToSpeech(this, this)
 
                   etInput = findViewById(R.id.etTranslateInput)
@@ -1246,8 +1194,11 @@ jobs:
                   btnSourceLang.text = sourceLang
                   btnTargetLang.text = targetLang
 
-                  findViewById<View>(R.id.btnSettingsKey).setOnClickListener { showSettingsDialog() }
                   findViewById<View>(R.id.btnPasteChip).setOnClickListener { handlePaste() }
+                  findViewById<View>(R.id.btnClearChip).setOnClickListener {
+                      etInput.setText("")
+                      cardResult.visibility = View.GONE
+                  }
                   findViewById<View>(R.id.btnSwapLang).setOnClickListener { swapLanguages() }
 
                   btnSourceLang.setOnClickListener { showLanguagePicker(true) }
@@ -1269,10 +1220,6 @@ jobs:
 
                   findViewById<View>(R.id.btnMainMic).setOnClickListener {
                       checkMicAndListen()
-                  }
-
-                  findViewById<View>(R.id.btnInternalAudio).setOnClickListener {
-                      requestInternalAudioCapture()
                   }
               }
 
@@ -1309,7 +1256,6 @@ jobs:
                   }
                   textToSpeech?.language = locale
                   textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, "TTS_ID")
-                  Toast.makeText(this, "در حال پخش از اسپیکر...", Toast.LENGTH_SHORT).show()
               }
 
               private fun handlePaste() {
@@ -1366,51 +1312,28 @@ jobs:
                       }.show()
               }
 
-              private fun showSettingsDialog() {
-                  val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
-                  val currentKey = prefs.getString("gemini_api_key", "")
-
-                  val input = EditText(this).apply {
-                      hint = "AIzaSy..."
-                      setText(currentKey)
-                      setPadding(40, 30, 40, 30)
-                  }
-
-                  AlertDialog.Builder(this)
-                      .setTitle("تنظیم کلید Gemini API")
-                      .setMessage("برای ترجمه صدای مستقیم ویدیوها با هوش مصنوعی، کلید Gemini را وارد کنید:")
-                      .setView(input)
-                      .setPositiveButton("ذخیره") { _, _ ->
-                          val key = input.text.toString().trim()
-                          prefs.edit().putString("gemini_api_key", key).apply()
-                          Toast.makeText(this, "کلید ذخیره شد", Toast.LENGTH_SHORT).show()
-                      }
-                      .setNegativeButton("انصراف", null)
-                      .show()
-              }
-
               private fun checkOverlayAndStartService() {
                   if (!Settings.canDrawOverlays(this)) {
                       startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
-                      Toast.makeText(this, "لطفاً دسترسی شناور را تایید کنید", Toast.LENGTH_LONG).show()
+                      Toast.makeText(this, "لطفاً دسترسی پنجره شناور را تایید کنید", Toast.LENGTH_LONG).show()
                       return
                   }
                   if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                      requestMicPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                      micForFloatingLauncher.launch(Manifest.permission.RECORD_AUDIO)
                       return
                   }
+                  launchFloatingServiceDirectly()
+              }
+
+              private fun launchFloatingServiceDirectly() {
                   val intent = Intent(this, FloatingWidgetService::class.java)
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      startForegroundService(intent)
-                  } else {
-                      startService(intent)
-                  }
-                  Toast.makeText(this, "پنجره شناور Emin Translate فعال شد", Toast.LENGTH_SHORT).show()
+                  startForegroundService(intent)
+                  Toast.makeText(this, "پنجره شناور فعال شد", Toast.LENGTH_SHORT).show()
               }
 
               private fun checkMicAndListen() {
                   if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                      requestMicPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                      micForMainAppLauncher.launch(Manifest.permission.RECORD_AUDIO)
                   } else {
                       startListeningAudio()
                   }
@@ -1452,87 +1375,6 @@ jobs:
                           override fun onEvent(eventType: Int, params: Bundle?) {}
                       })
                       speechRecognizer?.startListening(intent)
-                  }
-              }
-
-              private fun requestInternalAudioCapture() {
-                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                      Toast.makeText(this, "ضبط صدای فیلم نیازمند اندروید ۱۰ به بالا است", Toast.LENGTH_LONG).show()
-                      return
-                  }
-                  val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
-                  val key = prefs.getString("gemini_api_key", "") ?: ""
-                  if (key.isBlank()) {
-                      Toast.makeText(this, "ابتدا کلید Gemini را از چرخ‌دنده بالا ثبت کنید", Toast.LENGTH_LONG).show()
-                      return
-                  }
-                  screenCaptureLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
-              }
-
-              @SuppressLint("MissingPermission")
-              private fun startInternalAudioCapture(mediaProjection: MediaProjection) {
-                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
-
-                  cardResult.visibility = View.VISIBLE
-                  tvResult.text = "🔊 در حال ضبط ۵ ثانیه از صدای رسانه..."
-
-                  CoroutineScope(Dispatchers.IO).launch {
-                      try {
-                          val sampleRate = 16000
-                          val channelConfig = AudioFormat.CHANNEL_IN_MONO
-                          val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
-                          val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioEncoding) * 4
-
-                          val playbackConfig = AudioPlaybackCaptureConfiguration.Builder(mediaProjection)
-                              .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
-                              .addMatchingUsage(AudioAttributes.USAGE_GAME)
-                              .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
-                              .build()
-
-                          val audioRecord = AudioRecord.Builder()
-                              .setAudioPlaybackCaptureConfig(playbackConfig)
-                              .setAudioFormat(
-                                  AudioFormat.Builder()
-                                      .setEncoding(audioEncoding)
-                                      .setSampleRate(sampleRate)
-                                      .setChannelMask(channelConfig)
-                                      .build()
-                              )
-                              .setBufferSizeInBytes(bufferSize)
-                              .build()
-
-                          val outputStream = ByteArrayOutputStream()
-                          val buffer = ByteArray(bufferSize)
-                          audioRecord.startRecording()
-
-                          val startTime = System.currentTimeMillis()
-                          while (System.currentTimeMillis() - startTime < 5000) {
-                              val read = audioRecord.read(buffer, 0, buffer.size)
-                              if (read > 0) outputStream.write(buffer, 0, read)
-                          }
-
-                          audioRecord.stop()
-                          audioRecord.release()
-                          mediaProjection.stop()
-
-                          val wavData = TranslatorHelper.pcmToWav(outputStream.toByteArray(), sampleRate, 1)
-
-                          withContext(Dispatchers.Main) {
-                              tvResult.text = "🤖 هوش مصنوعی در حال تحلیل و ترجمه صدای رسانه..."
-                          }
-
-                          val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
-                          val apiKey = prefs.getString("gemini_api_key", "") ?: ""
-                          val response = TranslatorHelper.transcribeAndTranslateInternalAudio(wavData, targetLang, apiKey)
-
-                          withContext(Dispatchers.Main) {
-                              tvResult.text = response
-                          }
-                      } catch (e: Exception) {
-                          withContext(Dispatchers.Main) {
-                              tvResult.text = "خطا در ضبط صدای داخلی: ${e.localizedMessage}"
-                          }
-                      }
                   }
               }
 
