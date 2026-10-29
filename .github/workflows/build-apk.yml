@@ -29,7 +29,7 @@ jobs:
           rm -rf app/src settings.gradle build.gradle gradle.properties local.properties
 
           echo "sdk.dir=$ANDROID_HOME" > local.properties
-          echo "android.useAndroidX=true" > gradle.properties
+          echo "android.useAndroidX=true" >> gradle.properties
           echo "android.nonTransitiveRClass=false" >> gradle.properties
 
           # settings.gradle
@@ -48,7 +48,7 @@ jobs:
                   mavenCentral()
               }
           }
-          rootProject.name = "FloatingTranslator"
+          rootProject.name = "GoogleTranslateAI"
           include ':app'
           EOF
 
@@ -74,8 +74,8 @@ jobs:
                   applicationId "com.example.translator"
                   minSdk 24
                   targetSdk 34
-                  versionCode 3
-                  versionName "3.0-AI"
+                  versionCode 5
+                  versionName "5.0-Ultimate"
               }
               buildTypes {
                   release {
@@ -86,8 +86,8 @@ jobs:
                   sourceCompatibility JavaVersion.VERSION_17
                   targetCompatibility JavaVersion.VERSION_17
               }
-              kotlinOptions {
-                  jvmTarget = '17'
+              kotlin {
+                  jvmToolchain(17)
               }
           }
           dependencies {
@@ -98,55 +98,86 @@ jobs:
           }
           EOF
 
-          # ساخت پوشه‌ها
+          # پوشه‌ها
           mkdir -p app/src/main/res/values
           mkdir -p app/src/main/res/drawable
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/java/com/example/translator
 
-          # themes.xml
+          # themes.xml (تم مشکی گوگلی)
           cat << 'EOF' > app/src/main/res/values/themes.xml
           <?xml version="1.0" encoding="utf-8"?>
           <resources>
-              <style name="Theme.FloatingTranslator" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-                  <item name="colorPrimary">#1A73E8</item>
-                  <item name="colorPrimaryVariant">#1557B0</item>
-                  <item name="colorOnPrimary">#FFFFFF</item>
+              <style name="Theme.GoogleTranslateAI" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="colorPrimary">#A8C7FA</item>
+                  <item name="colorPrimaryVariant">#0F1015</item>
+                  <item name="colorOnPrimary">#003258</item>
+                  <item name="android:statusBarColor">#0F1015</item>
+                  <item name="android:navigationBarColor">#0F1015</item>
               </style>
           </resources>
           EOF
 
-          # bg_bubble.xml (آیکون حباب شناور)
+          # اشکال گرافیکی مدرن Material 3
+          cat << 'EOF' > app/src/main/res/drawable/bg_dark_card.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android">
+              <solid android:color="#1A1C22" />
+              <corners android:radius="24dp" />
+          </shape>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/drawable/bg_chip.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android">
+              <solid android:color="#24262E" />
+              <corners android:radius="20dp" />
+              <stroke android:width="1dp" android:color="#363942" />
+          </shape>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/drawable/bg_lang_pill.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android">
+              <solid android:color="#1F2128" />
+              <corners android:radius="16dp" />
+          </shape>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/drawable/bg_circle_button.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android"
+              android:shape="oval">
+              <solid android:color="#1F2128" />
+          </shape>
+          EOF
+
+          cat << 'EOF' > app/src/main/res/drawable/bg_mic_fab.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <shape xmlns:android="http://schemas.android.com/apk/res/android"
+              android:shape="oval">
+              <solid android:color="#A8C7FA" />
+          </shape>
+          EOF
+
           cat << 'EOF' > app/src/main/res/drawable/bg_bubble.xml
           <?xml version="1.0" encoding="utf-8"?>
           <shape xmlns:android="http://schemas.android.com/apk/res/android"
               android:shape="oval">
-              <solid android:color="#1A73E8" />
+              <solid android:color="#A8C7FA" />
               <stroke android:width="2dp" android:color="#FFFFFF" />
           </shape>
           EOF
 
-          # bg_window.xml (کادر پنجره شناور)
           cat << 'EOF' > app/src/main/res/drawable/bg_window.xml
           <?xml version="1.0" encoding="utf-8"?>
           <shape xmlns:android="http://schemas.android.com/apk/res/android">
-              <solid android:color="#F8F9FA" />
-              <corners android:radius="18dp" />
-              <stroke android:width="1dp" android:color="#DADCE0" />
+              <solid android:color="#1A1C22" />
+              <corners android:radius="20dp" />
+              <stroke android:width="1dp" android:color="#363942" />
           </shape>
           EOF
 
-          # bg_card.xml
-          cat << 'EOF' > app/src/main/res/drawable/bg_card.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <shape xmlns:android="http://schemas.android.com/apk/res/android">
-              <solid android:color="#FFFFFF" />
-              <corners android:radius="12dp" />
-              <stroke android:width="1dp" android:color="#E0E2E6" />
-          </shape>
-          EOF
-
-          # ic_app_icon.xml
           cat << 'EOF' > app/src/main/res/drawable/ic_app_icon.xml
           <?xml version="1.0" encoding="utf-8"?>
           <vector xmlns:android="http://schemas.android.com/apk/res/android"
@@ -155,112 +186,272 @@ jobs:
               android:viewportWidth="24"
               android:viewportHeight="24">
               <path
-                  android:fillColor="#1A73E8"
+                  android:fillColor="#A8C7FA"
                   android:pathData="M12.87,15.07l-2.54,-2.51.03,-.03c1.74,-1.94 2.98,-4.17 3.71,-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5,7.92 10.44,9.75 9,11.35 8.07,10.32 7.3,9.19 6.69,8h-2c.73,1.63 1.73,3.17 2.98,4.56l-5.11,5.02L4,19l5,-5 3.11,3.11.76,-2.04zM18.5,10h-2L12,22h2l1.12,-3h4.75L21,22h2l-4.5,-12zm-2.62,7l1.62,-4.33L19.12,17h-3.24z"/>
           </vector>
           EOF
 
-          # activity_main.xml
+          # activity_main.xml (رابط کاربری تاریک مطابق عکس)
           cat << 'EOF' > app/src/main/res/layout/activity_main.xml
           <?xml version="1.0" encoding="utf-8"?>
-          <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+          <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="#F8F9FA"
-              android:fillViewport="true">
+              android:background="#0F1015"
+              android:paddingHorizontal="16dp"
+              android:paddingTop="16dp"
+              android:paddingBottom="24dp">
 
-              <LinearLayout
+              <!-- نوار بالا: ستاره، عنوان ترنسلیت، آیکون کلید AI -->
+              <RelativeLayout
+                  android:id="@+id/layoutTopBar"
                   android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:gravity="center_horizontal"
-                  android:orientation="vertical"
-                  android:padding="24dp">
-
-                  <ImageView
-                      android:layout_width="72dp"
-                      android:layout_height="72dp"
-                      android:src="@drawable/ic_app_icon"
-                      android:layout_marginTop="20dp"
-                      android:layout_marginBottom="12dp" />
+                  android:layout_height="48dp">
 
                   <TextView
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="مترجم شناور مجهز به هوش مصنوعی"
-                      android:textSize="20sp"
-                      android:textStyle="bold"
-                      android:textColor="#202124"
-                      android:layout_marginBottom="6dp" />
+                      android:layout_alignParentStart="true"
+                      android:layout_centerVertical="true"
+                      android:text="★"
+                      android:textColor="#E2E2E6"
+                      android:textSize="22sp" />
 
                   <TextView
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="ترجمه سریع + درک اصطلاحات با AI"
-                      android:textSize="13sp"
-                      android:textColor="#5F6368"
-                      android:layout_marginBottom="24dp" />
+                      android:layout_centerInParent="true"
+                      android:text="Google Translate"
+                      android:textColor="#E2E2E6"
+                      android:textSize="19sp"
+                      android:textStyle="bold" />
 
-                  <!-- کادر تنظیمات Gemini API -->
+                  <TextView
+                      android:id="@+id/btnSettingsKey"
+                      android:layout_width="38dp"
+                      android:layout_height="38dp"
+                      android:layout_alignParentEnd="true"
+                      android:layout_centerVertical="true"
+                      android:background="@drawable/bg_circle_button"
+                      android:gravity="center"
+                      android:text="⚙"
+                      android:textColor="#A8C7FA"
+                      android:textSize="18sp" />
+              </RelativeLayout>
+
+              <!-- محتوای وسط: ورود متن، پیست و نتیجه ترجمه -->
+              <ScrollView
+                  android:id="@+id/scrollArea"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_above="@id/layoutBottomSection"
+                  android:layout_below="@id/layoutTopBar"
+                  android:layout_marginTop="16dp"
+                  android:fillViewport="true">
+
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:background="@drawable/bg_card"
-                      android:orientation="vertical"
-                      android:padding="16dp"
-                      android:layout_marginBottom="20dp">
-
-                      <TextView
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:text="✨ تنظیم کلید هوش مصنوعی (Google Gemini)"
-                          android:textStyle="bold"
-                          android:textColor="#1A73E8"
-                          android:textSize="14sp"
-                          android:layout_marginBottom="6dp" />
-
-                      <TextView
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:text="کلید رایگان Gemini API خود را وارد کنید (اختیاری؛ برای تحلیل عمیق و هوشمند اصطلاحات و فیلم‌ها):"
-                          android:textSize="12sp"
-                          android:textColor="#5F6368"
-                          android:layout_marginBottom="10dp" />
+                      android:orientation="vertical">
 
                       <EditText
-                          android:id="@+id/etApiKey"
+                          android:id="@+id/etTranslateInput"
                           android:layout_width="match_parent"
-                          android:layout_height="48dp"
-                          android:background="#F1F3F4"
-                          android:hint="AIzaSy..."
-                          android:paddingHorizontal="12dp"
-                          android:textSize="13sp"
-                          android:singleLine="true" />
+                          android:layout_height="wrap_content"
+                          android:minHeight="90dp"
+                          android:background="@null"
+                          android:gravity="top|start"
+                          android:hint="Translate text"
+                          android:textColor="#FFFFFF"
+                          android:textColorHint="#6C707A"
+                          android:textSize="24sp" />
 
-                      <Button
-                          android:id="@+id/btnSaveApiKey"
+                      <!-- دکمه Paste کپسولی -->
+                      <LinearLayout
+                          android:id="@+id/btnPasteChip"
                           android:layout_width="wrap_content"
                           android:layout_height="38dp"
-                          android:layout_gravity="end"
-                          android:layout_marginTop="8dp"
-                          android:backgroundTint="#1A73E8"
-                          android:text="ذخیره کلید AI"
-                          android:textSize="12sp" />
+                          android:layout_marginTop="6dp"
+                          android:background="@drawable/bg_chip"
+                          android:gravity="center_vertical"
+                          android:paddingHorizontal="16dp">
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="📋  Paste"
+                              android:textColor="#E2E2E6"
+                              android:textSize="14sp"
+                              android:textStyle="bold" />
+                      </LinearLayout>
+
+                      <!-- کارت نتیجه ترجمه -->
+                      <LinearLayout
+                          android:id="@+id/cardResult"
+                          android:layout_width="match_parent"
+                          android:layout_height="wrap_content"
+                          android:layout_marginTop="20dp"
+                          android:background="@drawable/bg_dark_card"
+                          android:orientation="vertical"
+                          android:padding="16dp"
+                          android:visibility="gone">
+
+                          <TextView
+                              android:id="@+id/tvTranslationResult"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:textColor="#A8C7FA"
+                              android:textSize="18sp"
+                              android:lineSpacingExtra="4dp" />
+
+                          <LinearLayout
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:gravity="end"
+                              android:layout_marginTop="12dp">
+
+                              <Button
+                                  android:id="@+id/btnCopyResult"
+                                  android:layout_width="wrap_content"
+                                  android:layout_height="34dp"
+                                  android:backgroundTint="#24262E"
+                                  android:text="کپی متن"
+                                  android:textColor="#E2E2E6"
+                                  android:textSize="11sp" />
+                          </LinearLayout>
+                      </LinearLayout>
+                  </LinearLayout>
+              </ScrollView>
+
+              <!-- بخش کنترل پایین: زبان‌ها و دکمه‌های اکشن -->
+              <LinearLayout
+                  android:id="@+id/layoutBottomSection"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_alignParentBottom="true"
+                  android:orientation="vertical">
+
+                  <!-- نوار انتخاب دو زبانه -->
+                  <LinearLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="54dp"
+                      android:gravity="center_vertical"
+                      android:orientation="horizontal">
+
+                      <TextView
+                          android:id="@+id/btnSourceLang"
+                          android:layout_width="0dp"
+                          android:layout_weight="1"
+                          android:layout_height="match_parent"
+                          android:background="@drawable/bg_lang_pill"
+                          android:gravity="center"
+                          android:text="Turkish"
+                          android:textColor="#E2E2E6"
+                          android:textSize="15sp"
+                          android:textStyle="bold" />
+
+                      <ImageView
+                          android:id="@+id/btnSwapLang"
+                          android:layout_width="44dp"
+                          android:layout_height="44dp"
+                          android:padding="10dp"
+                          android:src="@android:drawable/ic_popup_sync" />
+
+                      <TextView
+                          android:id="@+id/btnTargetLang"
+                          android:layout_width="0dp"
+                          android:layout_weight="1"
+                          android:layout_height="match_parent"
+                          android:background="@drawable/bg_lang_pill"
+                          android:gravity="center"
+                          android:text="Persian"
+                          android:textColor="#E2E2E6"
+                          android:textSize="15sp"
+                          android:textStyle="bold" />
                   </LinearLayout>
 
-                  <Button
-                      android:id="@+id/btnStartFloating"
+                  <!-- سه دکمه اصلی: شناور، میکروفون، ضبط صدای داخلی گوشی -->
+                  <LinearLayout
                       android:layout_width="match_parent"
-                      android:layout_height="56dp"
-                      android:backgroundTint="#1E8E3E"
-                      android:textColor="#FFFFFF"
-                      android:text="فعال‌سازی مترجم شناور روی صفحه"
-                      android:textSize="15sp"
-                      android:textStyle="bold" />
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="18dp"
+                      android:gravity="center_vertical"
+                      android:orientation="horizontal">
+
+                      <!-- دکمه پنجره شناور -->
+                      <LinearLayout
+                          android:id="@+id/btnToggleFloating"
+                          android:layout_width="0dp"
+                          android:layout_weight="1"
+                          android:layout_height="wrap_content"
+                          android:gravity="center"
+                          android:orientation="vertical">
+
+                          <TextView
+                              android:layout_width="56dp"
+                              android:layout_height="56dp"
+                              android:background="@drawable/bg_circle_button"
+                              android:gravity="center"
+                              android:text="🪟"
+                              android:textSize="22sp" />
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="6dp"
+                              android:text="شناور"
+                              android:textColor="#A0A4AE"
+                              android:textSize="12sp" />
+                      </LinearLayout>
+
+                      <!-- دکمه بزرگ میکروفون اصلی (گفتار شما) -->
+                      <LinearLayout
+                          android:id="@+id/btnMainMic"
+                          android:layout_width="74dp"
+                          android:layout_height="74dp"
+                          android:background="@drawable/bg_mic_fab"
+                          android:elevation="6dp"
+                          android:gravity="center">
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:text="🎙"
+                              android:textSize="28sp" />
+                      </LinearLayout>
+
+                      <!-- دکمه ضبط صدای در حال پخش از خود گوشی (فیلم/اینستاگرام) -->
+                      <LinearLayout
+                          android:id="@+id/btnInternalAudio"
+                          android:layout_width="0dp"
+                          android:layout_weight="1"
+                          android:layout_height="wrap_content"
+                          android:gravity="center"
+                          android:orientation="vertical">
+
+                          <TextView
+                              android:layout_width="56dp"
+                              android:layout_height="56dp"
+                              android:background="@drawable/bg_circle_button"
+                              android:gravity="center"
+                              android:text="🔊"
+                              android:textSize="22sp" />
+
+                          <TextView
+                              android:layout_width="wrap_content"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="6dp"
+                              android:text="صدای فیلم"
+                              android:textColor="#A0A4AE"
+                              android:textSize="12sp" />
+                      </LinearLayout>
+
+                  </LinearLayout>
               </LinearLayout>
-          </ScrollView>
+          </RelativeLayout>
           EOF
 
-          # floating_widget_layout.xml
+          # floating_widget_layout.xml (ویجت شناور هماهنگ با تم تیره)
           cat << 'EOF' > app/src/main/res/layout/floating_widget_layout.xml
           <?xml version="1.0" encoding="utf-8"?>
           <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -268,28 +459,27 @@ jobs:
               android:layout_width="wrap_content"
               android:layout_height="wrap_content">
 
-              <!-- حباب شناور کوچک -->
+              <!-- حباب شناور -->
               <LinearLayout
                   android:id="@+id/layout_collapsed"
                   android:layout_width="56dp"
                   android:layout_height="56dp"
                   android:background="@drawable/bg_bubble"
                   android:gravity="center"
-                  android:elevation="8dp"
-                  android:visibility="visible">
+                  android:elevation="8dp">
                   <TextView
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
-                      android:text="AI"
-                      android:textColor="#FFFFFF"
-                      android:textSize="20sp"
+                      android:text="GT"
+                      android:textColor="#003258"
+                      android:textSize="18sp"
                       android:textStyle="bold" />
               </LinearLayout>
 
-              <!-- پنجره بازشده مترجم -->
+              <!-- پنجره بازشده -->
               <LinearLayout
                   android:id="@+id/layout_expanded"
-                  android:layout_width="340dp"
+                  android:layout_width="330dp"
                   android:layout_height="wrap_content"
                   android:background="@drawable/bg_window"
                   android:orientation="vertical"
@@ -297,83 +487,46 @@ jobs:
                   android:elevation="12dp"
                   android:visibility="gone">
 
-                  <!-- نوار بالای پنجره (جابجایی پنجره + بستن) -->
                   <LinearLayout
                       android:id="@+id/layout_header_drag"
                       android:layout_width="match_parent"
                       android:layout_height="36dp"
                       android:gravity="center_vertical"
-                      android:orientation="horizontal"
-                      android:paddingHorizontal="4dp">
+                      android:orientation="horizontal">
 
                       <TextView
                           android:layout_width="0dp"
                           android:layout_weight="1"
                           android:layout_height="wrap_content"
-                          android:text="مترجم هوشمند شناور"
-                          android:textColor="#1A73E8"
+                          android:text="Google Translate AI"
+                          android:textColor="#A8C7FA"
                           android:textSize="13sp"
                           android:textStyle="bold" />
 
                       <TextView
                           android:id="@+id/btnMinimize"
-                          android:layout_width="28dp"
-                          android:layout_height="28dp"
+                          android:layout_width="32dp"
+                          android:layout_height="32dp"
                           android:gravity="center"
                           android:text="—"
-                          android:textColor="#5F6368"
-                          android:textSize="14sp"
-                          android:textStyle="bold" />
+                          android:textColor="#9AA0A6"
+                          android:textSize="15sp" />
 
                       <TextView
                           android:id="@+id/btnCloseApp"
-                          android:layout_width="28dp"
-                          android:layout_height="28dp"
-                          android:gravity="center"
-                          android:text="✕"
-                          android:textColor="#D93025"
-                          android:textSize="15sp"
-                          android:textStyle="bold" />
-                  </LinearLayout>
-
-                  <!-- انتخاب دوطرفه زبان‌ها -->
-                  <LinearLayout
-                      android:layout_width="match_parent"
-                      android:layout_height="40dp"
-                      android:layout_marginTop="4dp"
-                      android:background="@drawable/bg_card"
-                      android:gravity="center_vertical"
-                      android:paddingHorizontal="4dp"
-                      android:orientation="horizontal">
-
-                      <Spinner
-                          android:id="@+id/spinnerSource"
-                          android:layout_width="0dp"
-                          android:layout_weight="1"
-                          android:layout_height="wrap_content"
-                          android:background="@null" />
-
-                      <ImageView
-                          android:id="@+id/btnSwapLang"
                           android:layout_width="32dp"
                           android:layout_height="32dp"
-                          android:padding="6dp"
-                          android:src="@android:drawable/ic_popup_sync" />
-
-                      <Spinner
-                          android:id="@+id/spinnerTarget"
-                          android:layout_width="0dp"
-                          android:layout_weight="1"
-                          android:layout_height="wrap_content"
-                          android:background="@null" />
+                          android:gravity="center"
+                          android:text="✕"
+                          android:textColor="#F28B82"
+                          android:textSize="15sp" />
                   </LinearLayout>
 
-                  <!-- متن ورودی و دکمه‌ها -->
                   <LinearLayout
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginTop="8dp"
-                      android:background="@drawable/bg_card"
+                      android:layout_marginTop="6dp"
+                      android:background="@drawable/bg_dark_card"
                       android:orientation="vertical"
                       android:padding="8dp">
 
@@ -383,14 +536,14 @@ jobs:
                           android:layout_height="64dp"
                           android:background="@null"
                           android:gravity="top|start"
-                          android:hint="متن انگلیسی یا صدای فیلم..."
+                          android:hint="تایپ یا ضبط گفتار..."
                           android:textSize="13sp"
-                          android:textColor="#202124"
-                          android:textColorHint="#9AA0A6" />
+                          android:textColor="#FFFFFF"
+                          android:textColorHint="#6C707A" />
 
                       <LinearLayout
                           android:layout_width="match_parent"
-                          android:layout_height="38dp"
+                          android:layout_height="36dp"
                           android:gravity="end|center_vertical"
                           android:orientation="horizontal">
 
@@ -398,77 +551,37 @@ jobs:
                               android:id="@+id/btnMic"
                               android:layout_width="wrap_content"
                               android:layout_height="32dp"
-                              android:paddingHorizontal="8dp"
-                              android:backgroundTint="#EA4335"
+                              android:backgroundTint="#A8C7FA"
+                              android:textColor="#003258"
                               android:text="🎙 گفتار"
-                              android:textColor="#FFFFFF"
                               android:textSize="11sp" />
 
                           <Button
                               android:id="@+id/btnTranslate"
                               android:layout_width="wrap_content"
                               android:layout_height="32dp"
-                              android:layout_marginStart="4dp"
-                              android:backgroundTint="#1A73E8"
-                              android:text="ترجمه سریع"
-                              android:textColor="#FFFFFF"
-                              android:textSize="11sp" />
-
-                          <Button
-                              android:id="@+id/btnAi"
-                              android:layout_width="wrap_content"
-                              android:layout_height="32dp"
-                              android:layout_marginStart="4dp"
-                              android:backgroundTint="#9334E6"
-                              android:text="✨ تحلیل AI"
-                              android:textColor="#FFFFFF"
+                              android:layout_marginStart="6dp"
+                              android:backgroundTint="#24262E"
+                              android:textColor="#E2E2E6"
+                              android:text="ترجمه"
                               android:textSize="11sp" />
                       </LinearLayout>
                   </LinearLayout>
 
-                  <!-- کادر پاسخ و نتیجه ترجمه -->
-                  <LinearLayout
+                  <ScrollView
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
-                      android:layout_marginTop="8dp"
-                      android:background="@drawable/bg_card"
-                      android:orientation="vertical"
-                      android:padding="8dp">
+                      android:maxHeight="110dp"
+                      android:layout_marginTop="8dp">
 
-                      <ScrollView
+                      <TextView
+                          android:id="@+id/tvResult"
                           android:layout_width="match_parent"
                           android:layout_height="wrap_content"
-                          android:maxHeight="130dp">
-
-                          <TextView
-                              android:id="@+id/tvResult"
-                              android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                              android:minHeight="48dp"
-                              android:text="ترجمه یا پاسخ هوش مصنوعی اینجا ظاهر می‌شود..."
-                              android:textColor="#202124"
-                              android:textSize="13sp" />
-                      </ScrollView>
-
-                      <LinearLayout
-                          android:layout_width="match_parent"
-                          android:layout_height="28dp"
-                          android:gravity="end|center_vertical"
-                          android:orientation="horizontal"
-                          android:layout_marginTop="4dp">
-
-                          <Button
-                              android:id="@+id/btnCopy"
-                              android:layout_width="wrap_content"
-                              android:layout_height="26dp"
-                              android:backgroundTint="#5F6368"
-                              android:paddingHorizontal="8dp"
-                              android:text="📋 کپی"
-                              android:textColor="#FFFFFF"
-                              android:textSize="10sp" />
-                      </LinearLayout>
-                  </LinearLayout>
-
+                          android:textColor="#A8C7FA"
+                          android:textSize="13sp"
+                          android:text="ترجمه اینجا نمایش داده می‌شود..." />
+                  </ScrollView>
               </LinearLayout>
           </FrameLayout>
           EOF
@@ -482,16 +595,19 @@ jobs:
               <uses-permission android:name="android.permission.INTERNET" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
               <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+
               <application
                   android:allowBackup="true"
                   android:icon="@drawable/ic_app_icon"
-                  android:label="مترجم شناور AI"
+                  android:label="Translate AI"
                   android:roundIcon="@drawable/ic_app_icon"
-                  android:supportsRtl="true"
-                  android:theme="@style/Theme.FloatingTranslator">
+                  android:supportsRtl="false"
+                  android:theme="@style/Theme.GoogleTranslateAI">
                   <activity
                       android:name=".MainActivity"
-                      android:exported="true">
+                      android:exported="true"
+                      android:windowSoftInputMode="adjustResize">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
@@ -501,14 +617,16 @@ jobs:
                       android:name=".FloatingWidgetService"
                       android:enabled="true"
                       android:exported="false"
-                      android:foregroundServiceType="microphone" />
+                      android:foregroundServiceType="microphone|mediaProjection" />
               </application>
           </manifest>
           EOF
 
-          # TranslatorHelper.kt (پشتیبانی از گوگل ترنسلیت و هوش مصنوعی جمینای)
+          # TranslatorHelper.kt (پشتیبانی از ترجمه سریع و تحلیل صوت با هوش مصنوعی Gemini)
           cat << 'EOF' > app/src/main/java/com/example/translator/TranslatorHelper.kt
           package com.example.translator
+
+          import android.util.Base64
           import kotlinx.coroutines.Dispatchers
           import kotlinx.coroutines.withContext
           import org.json.JSONArray
@@ -519,15 +637,18 @@ jobs:
 
           object TranslatorHelper {
 
-              // ترجمه مستقیم و سریع گوگل بدون نیاز به کلید
               suspend fun translate(text: String, from: String, to: String): String {
                   return withContext(Dispatchers.IO) {
+                      var conn: HttpURLConnection? = null
                       try {
                           val encodedText = URLEncoder.encode(text, "UTF-8")
                           val urlString = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=$from&tl=$to&dt=t&q=$encodedText"
-                          val conn = URL(urlString).openConnection() as HttpURLConnection
+                          conn = URL(urlString).openConnection() as HttpURLConnection
                           conn.requestMethod = "GET"
+                          conn.connectTimeout = 8000
+                          conn.readTimeout = 8000
                           conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+
                           val response = conn.inputStream.bufferedReader().use { it.readText() }
                           val jsonArray = JSONArray(response)
                           val sentences = jsonArray.getJSONArray(0)
@@ -537,55 +658,102 @@ jobs:
                           }
                           result.toString()
                       } catch (e: Exception) {
-                          "خطا در ترجمه سریع: ${e.localizedMessage}"
+                          "خطا در ترجمه: ${e.localizedMessage}"
+                      } finally {
+                          conn?.disconnect()
                       }
                   }
               }
 
-              // ترجمه و تحلیل هوشمند با Google Gemini AI
-              suspend fun askGemini(text: String, fromLang: String, toLang: String, apiKey: String): String {
+              // ارسال مستقیم فایل صوتی ضبط شده از سیستم گوشی به Gemini جهت تبدیل به متن و ترجمه
+              suspend fun transcribeAndTranslateInternalAudio(wavBytes: ByteArray, targetLang: String, apiKey: String): String {
                   return withContext(Dispatchers.IO) {
+                      var conn: HttpURLConnection? = null
                       try {
-                          val prompt = "You are an expert multilingual AI translator and assistant. " +
-                                  "Translate the following text from $fromLang to $toLang with natural fluency. " +
-                                  "If there are any idioms, slang, or context, briefly explain them. " +
-                                  "If the input is a question or request, fulfill it directly in $toLang.\n\nInput: \"$text\""
+                          val base64Audio = Base64.encodeToString(wavBytes, Base64.NO_WRAP)
+                          val prompt = "This is an internal audio clip recorded directly from a video/media on the phone. " +
+                                  "1. Accurately transcribe what is being spoken.\n" +
+                                  "2. Translate it into $targetLang.\n" +
+                                  "Provide a clean output with the transcript and translation."
 
                           val url = URL("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey")
-                          val conn = url.openConnection() as HttpURLConnection
+                          conn = url.openConnection() as HttpURLConnection
                           conn.requestMethod = "POST"
+                          conn.connectTimeout = 20000
+                          conn.readTimeout = 25000
                           conn.setRequestProperty("Content-Type", "application/json")
                           conn.doOutput = true
 
-                          val rootJson = JSONObject().apply {
+                          val root = JSONObject().apply {
                               put("contents", JSONArray().apply {
                                   put(JSONObject().apply {
                                       put("parts", JSONArray().apply {
+                                          put(JSONObject().apply { put("text", prompt) })
                                           put(JSONObject().apply {
-                                              put("text", prompt)
+                                              put("inline_data", JSONObject().apply {
+                                                  put("mime_type", "audio/wav")
+                                                  put("data", base64Audio)
+                                              })
                                           })
                                       })
                                   })
                               })
                           }
 
-                          conn.outputStream.use { it.write(rootJson.toString().toByteArray(Charsets.UTF_8)) }
+                          conn.outputStream.use { it.write(root.toString().toByteArray(Charsets.UTF_8)) }
 
                           if (conn.responseCode == 200) {
                               val response = conn.inputStream.bufferedReader().use { it.readText() }
                               val json = JSONObject(response)
-                              val candidates = json.getJSONArray("candidates")
-                              val content = candidates.getJSONObject(0).getJSONObject("content")
-                              val parts = content.getJSONArray("parts")
-                              parts.getJSONObject(0).getString("text").trim()
+                              json.getJSONArray("candidates")
+                                  .getJSONObject(0)
+                                  .getJSONObject("content")
+                                  .getJSONArray("parts")
+                                  .getJSONObject(0)
+                                  .getString("text").trim()
                           } else {
-                              val errorMsg = conn.errorStream?.bufferedReader()?.use { it.readText() } ?: ""
-                              "خطا در ارتباط با هوش مصنوعی (کد ${conn.responseCode}). لطفاً کلید API را بررسی کنید."
+                              "خطای هوش مصنوعی (کد ${conn.responseCode}). کلید API را چک کنید."
                           }
                       } catch (e: Exception) {
-                          "خطا در ارتباط با هوش مصنوعی: ${e.localizedMessage}"
+                          "خطا در تحلیل صدا: ${e.localizedMessage}"
+                      } finally {
+                          conn?.disconnect()
                       }
                   }
+              }
+
+              // تولید هدر WAV برای استریم صوتی خام PCM
+              fun pcmToWav(pcmData: ByteArray, sampleRate: Int = 16000, channels: Int = 1): ByteArray {
+                  val totalAudioLen = pcmData.size
+                  val totalDataLen = totalAudioLen + 36
+                  val byteRate = sampleRate * channels * 2
+                  val header = ByteArray(44)
+                  header[0] = 'R'.code.toByte(); header[1] = 'I'.code.toByte(); header[2] = 'F'.code.toByte(); header[3] = 'F'.code.toByte()
+                  header[4] = (totalDataLen and 0xff).toByte()
+                  header[5] = ((totalDataLen shr 8) and 0xff).toByte()
+                  header[6] = ((totalDataLen shr 16) and 0xff).toByte()
+                  header[7] = ((totalDataLen shr 24) and 0xff).toByte()
+                  header[8] = 'W'.code.toByte(); header[9] = 'A'.code.toByte(); header[10] = 'V'.code.toByte(); header[11] = 'E'.code.toByte()
+                  header[12] = 'f'.code.toByte(); header[13] = 'm'.code.toByte(); header[14] = 't'.code.toByte(); header[15] = ' '.code.toByte()
+                  header[16] = 16; header[17] = 0; header[18] = 0; header[19] = 0
+                  header[20] = 1; header[21] = 0 // PCM
+                  header[22] = channels.toByte(); header[23] = 0
+                  header[24] = (sampleRate and 0xff).toByte()
+                  header[25] = ((sampleRate shr 8) and 0xff).toByte()
+                  header[26] = ((sampleRate shr 16) and 0xff).toByte()
+                  header[27] = ((sampleRate shr 24) and 0xff).toByte()
+                  header[28] = (byteRate and 0xff).toByte()
+                  header[29] = ((byteRate shr 8) and 0xff).toByte()
+                  header[30] = ((byteRate shr 16) and 0xff).toByte()
+                  header[31] = ((byteRate shr 24) and 0xff).toByte()
+                  header[32] = (channels * 2).toByte(); header[33] = 0
+                  header[34] = 16; header[35] = 0
+                  header[36] = 'd'.code.toByte(); header[37] = 'a'.code.toByte(); header[38] = 't'.code.toByte(); header[39] = 'a'.code.toByte()
+                  header[40] = (totalAudioLen and 0xff).toByte()
+                  header[41] = ((totalAudioLen shr 8) and 0xff).toByte()
+                  header[42] = ((totalAudioLen shr 16) and 0xff).toByte()
+                  header[43] = ((totalAudioLen shr 24) and 0xff).toByte()
+                  return header + pcmData
               }
           }
           EOF
@@ -593,6 +761,7 @@ jobs:
           # FloatingWidgetService.kt
           cat << 'EOF' > app/src/main/java/com/example/translator/FloatingWidgetService.kt
           package com.example.translator
+
           import android.annotation.SuppressLint
           import android.app.*
           import android.content.*
@@ -613,27 +782,11 @@ jobs:
               private lateinit var params: WindowManager.LayoutParams
               private var speechRecognizer: SpeechRecognizer? = null
 
-              private val langNames = listOf("انگلیسی", "فارسی", "ترکی", "عربی", "روسی")
-              private val langCodes = mapOf(
-                  "انگلیسی" to "en",
-                  "فارسی" to "fa",
-                  "ترکی" to "tr",
-                  "عربی" to "ar",
-                  "روسی" to "ru"
-              )
-              private val speechCodes = mapOf(
-                  "en" to "en-US",
-                  "fa" to "fa-IR",
-                  "tr" to "tr-TR",
-                  "ar" to "ar-SA",
-                  "ru" to "ru-RU"
-              )
-
               override fun onBind(intent: Intent?): IBinder? = null
 
               override fun onCreate() {
                   super.onCreate()
-                  startForegroundNotification()
+                  startServiceNotification()
 
                   windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
                   floatingView = LayoutInflater.from(this).inflate(R.layout.floating_widget_layout, null)
@@ -654,7 +807,7 @@ jobs:
                   ).apply {
                       gravity = Gravity.TOP or Gravity.START
                       x = 60
-                      y = 180
+                      y = 200
                   }
 
                   windowManager.addView(floatingView, params)
@@ -666,34 +819,14 @@ jobs:
                   val collapsed = floatingView.findViewById<View>(R.id.layout_collapsed)
                   val expanded = floatingView.findViewById<View>(R.id.layout_expanded)
                   val headerDrag = floatingView.findViewById<View>(R.id.layout_header_drag)
-
                   val btnMinimize = floatingView.findViewById<TextView>(R.id.btnMinimize)
                   val btnCloseApp = floatingView.findViewById<TextView>(R.id.btnCloseApp)
-
-                  val spinnerSource = floatingView.findViewById<Spinner>(R.id.spinnerSource)
-                  val spinnerTarget = floatingView.findViewById<Spinner>(R.id.spinnerTarget)
-                  val btnSwapLang = floatingView.findViewById<ImageView>(R.id.btnSwapLang)
-
                   val etInput = floatingView.findViewById<EditText>(R.id.etInput)
                   val btnTranslate = floatingView.findViewById<Button>(R.id.btnTranslate)
-                  val btnAi = floatingView.findViewById<Button>(R.id.btnAi)
                   val btnMic = floatingView.findViewById<Button>(R.id.btnMic)
                   val tvResult = floatingView.findViewById<TextView>(R.id.tvResult)
-                  val btnCopy = floatingView.findViewById<Button>(R.id.btnCopy)
 
-                  val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, langNames)
-                  spinnerSource.adapter = adapter
-                  spinnerTarget.adapter = adapter
-                  spinnerSource.setSelection(0)
-                  spinnerTarget.setSelection(1)
-
-                  btnSwapLang.setOnClickListener {
-                      val currentSource = spinnerSource.selectedItemPosition
-                      val currentTarget = spinnerTarget.selectedItemPosition
-                      spinnerSource.setSelection(currentTarget)
-                      spinnerTarget.setSelection(currentSource)
-                  }
-
+                  // رفع مشکل باز شدن کیبورد
                   collapsed.setOnClickListener {
                       collapsed.visibility = View.GONE
                       expanded.visibility = View.VISIBLE
@@ -709,125 +842,59 @@ jobs:
                   }
 
                   btnCloseApp.setOnClickListener {
-                      Toast.makeText(this, "مترجم هوشمند متوقف شد", Toast.LENGTH_SHORT).show()
                       stopSelf()
                   }
 
-                  // ترجمه سریع و کلاسیک
                   btnTranslate.setOnClickListener {
                       val text = etInput.text.toString().trim()
                       if (text.isNotEmpty()) {
-                          val srcLang = langCodes[spinnerSource.selectedItem.toString()] ?: "en"
-                          val targetLang = langCodes[spinnerTarget.selectedItem.toString()] ?: "fa"
-                          tvResult.text = "در حال ترجمه سریع..."
+                          tvResult.text = "در حال ترجمه..."
                           CoroutineScope(Dispatchers.Main).launch {
-                              tvResult.text = TranslatorHelper.translate(text, srcLang, targetLang)
+                              tvResult.text = TranslatorHelper.translate(text, "auto", "fa")
                           }
                       }
                   }
 
-                  // تحلیل عمیق و پاسخ با هوش مصنوعی Gemini
-                  btnAi.setOnClickListener {
-                      val text = etInput.text.toString().trim()
-                      if (text.isEmpty()) {
-                          Toast.makeText(this, "لطفاً ابتدا متنی وارد کنید", Toast.LENGTH_SHORT).show()
-                          return@setOnClickListener
-                      }
-
-                      val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
-                      val apiKey = prefs.getString("gemini_api_key", "") ?: ""
-
-                      if (apiKey.isBlank()) {
-                          tvResult.text = "⚠️ کلید هوش مصنوعی ثبت نشده است!\nلطفاً برنامه اصلی را باز کنید و Gemini API Key خود را وارد کنید."
-                          return@setOnClickListener
-                      }
-
-                      val srcLang = spinnerSource.selectedItem.toString()
-                      val targetLang = spinnerTarget.selectedItem.toString()
-
-                      tvResult.text = "🤖 هوش مصنوعی در حال تحلیل و ترجمه عمیق..."
-                      CoroutineScope(Dispatchers.Main).launch {
-                          tvResult.text = TranslatorHelper.askGemini(text, srcLang, targetLang, apiKey)
-                      }
-                  }
-
-                  btnCopy.setOnClickListener {
-                      val result = tvResult.text.toString()
-                      if (result.isNotEmpty()) {
-                          val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                          clipboard.setPrimaryClip(ClipData.newPlainText("Result", result))
-                          Toast.makeText(this, "متن کپی شد", Toast.LENGTH_SHORT).show()
-                      }
-                  }
-
                   btnMic.setOnClickListener {
-                      val srcCode = langCodes[spinnerSource.selectedItem.toString()] ?: "en"
-                      val speechLocale = speechCodes[srcCode] ?: "en-US"
-                      startListening(speechLocale, etInput, tvResult, spinnerSource, spinnerTarget)
+                      if (!SpeechRecognizer.isRecognitionAvailable(this)) return@setOnClickListener
+                      speechRecognizer?.destroy()
+                      speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
+                      val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                          putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                      }
+                      speechRecognizer?.setRecognitionListener(object : RecognitionListener {
+                          override fun onReadyForSpeech(params: Bundle?) { tvResult.text = "در حال شنیدن گفتار..." }
+                          override fun onResults(results: Bundle?) {
+                              val text = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0) ?: ""
+                              etInput.setText(text)
+                              CoroutineScope(Dispatchers.Main).launch {
+                                  tvResult.text = TranslatorHelper.translate(text, "auto", "fa")
+                              }
+                          }
+                          override fun onError(error: Int) { tvResult.text = "صدا واضح نبود." }
+                          override fun onBeginningOfSpeech() {}
+                          override fun onRmsChanged(rmsdB: Float) {}
+                          override fun onBufferReceived(buffer: ByteArray?) {}
+                          override fun onEndOfSpeech() {}
+                          override fun onPartialResults(partialResults: Bundle?) {}
+                          override fun onEvent(eventType: Int, params: Bundle?) {}
+                      })
+                      speechRecognizer?.startListening(intent)
                   }
 
                   attachDragListener(collapsed)
                   attachDragListener(headerDrag)
               }
 
-              private fun startListening(
-                  localeTag: String,
-                  etInput: EditText,
-                  tvResult: TextView,
-                  spinnerSource: Spinner,
-                  spinnerTarget: Spinner
-              ) {
-                  if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-                      Toast.makeText(this, "موتور تشخیص صوت فعال نیست", Toast.LENGTH_SHORT).show()
-                      return
-                  }
-                  speechRecognizer?.destroy()
-                  speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-
-                  val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                      putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                      putExtra(RecognizerIntent.EXTRA_LANGUAGE, localeTag)
-                  }
-
-                  speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-                      override fun onReadyForSpeech(params: Bundle?) { tvResult.text = "در حال شنیدن گفتار..." }
-                      override fun onResults(results: Bundle?) {
-                          val matches = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                          if (!matches.isNullOrEmpty()) {
-                              val heard = matches[0]
-                              etInput.setText(heard)
-                              val srcLang = langCodes[spinnerSource.selectedItem.toString()] ?: "en"
-                              val targetLang = langCodes[spinnerTarget.selectedItem.toString()] ?: "fa"
-                              CoroutineScope(Dispatchers.Main).launch {
-                                  tvResult.text = "در حال ترجمه سریع..."
-                                  tvResult.text = TranslatorHelper.translate(heard, srcLang, targetLang)
-                              }
-                          }
-                      }
-                      override fun onError(error: Int) { tvResult.text = "صدا واضح نبود یا دریافت نشد." }
-                      override fun onBeginningOfSpeech() {}
-                      override fun onRmsChanged(rmsdB: Float) {}
-                      override fun onBufferReceived(buffer: ByteArray?) {}
-                      override fun onEndOfSpeech() {}
-                      override fun onPartialResults(partialResults: Bundle?) {}
-                      override fun onEvent(eventType: Int, params: Bundle?) {}
-                  })
-                  speechRecognizer?.startListening(intent)
-              }
-
               @SuppressLint("ClickableViewAccessibility")
               private fun attachDragListener(view: View) {
-                  var initialX = 0
-                  var initialY = 0
-                  var initialTouchX = 0f
-                  var initialTouchY = 0f
+                  var initialX = 0; var initialY = 0
+                  var initialTouchX = 0f; var initialTouchY = 0f
                   view.setOnTouchListener { _, event ->
                       when (event.action) {
                           MotionEvent.ACTION_DOWN -> {
-                              initialX = params.x
-                              initialY = params.y
-                              initialTouchX = event.rawX
-                              initialTouchY = event.rawY
+                              initialX = params.x; initialY = params.y
+                              initialTouchX = event.rawX; initialTouchY = event.rawY
                               true
                           }
                           MotionEvent.ACTION_MOVE -> {
@@ -847,22 +914,22 @@ jobs:
                   }
               }
 
-              private fun startForegroundNotification() {
-                  val channelId = "floating_translator_channel"
+              private fun startServiceNotification() {
+                  val channelId = "floating_service_ch"
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      val channel = NotificationChannel(channelId, "مترجم شناور AI", NotificationManager.IMPORTANCE_LOW)
-                      getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+                      val channel = NotificationChannel(channelId, "مترجم شناور", NotificationManager.IMPORTANCE_LOW)
+                      getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
                   }
-                  val notification: Notification = NotificationCompat.Builder(this, channelId)
-                      .setContentTitle("مترجم هوشمند فعال است")
-                      .setContentText("روی حباب بنفش/آبی کلیک کنید")
+                  val notification = NotificationCompat.Builder(this, channelId)
+                      .setContentTitle("مترجم شناور فعال است")
+                      .setContentText("روی آیکون شناور ضربه بزنید")
                       .setSmallIcon(R.drawable.ic_app_icon)
                       .build()
 
-                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                      startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                      startForeground(1001, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE)
                   } else {
-                      startForeground(1, notification)
+                      startForeground(1001, notification)
                   }
               }
 
@@ -876,85 +943,318 @@ jobs:
           }
           EOF
 
-          # MainActivity.kt (ذخیره کلید API و هدایت به سرویس)
+          # MainActivity.kt
           cat << 'EOF' > app/src/main/java/com/example/translator/MainActivity.kt
           package com.example.translator
+
           import android.Manifest
-          import android.content.Context
-          import android.content.Intent
+          import android.annotation.SuppressLint
+          import android.content.*
           import android.content.pm.PackageManager
+          import android.media.*
+          import android.media.projection.MediaProjection
+          import android.media.projection.MediaProjectionManager
           import android.net.Uri
-          import android.os.Build
-          import android.os.Bundle
+          import android.os.*
           import android.provider.Settings
-          import android.widget.Button
-          import android.widget.EditText
-          import android.widget.Toast
+          import android.speech.*
+          import android.view.View
+          import android.widget.*
+          import androidx.activity.result.contract.ActivityResultContracts
+          import androidx.appcompat.app.AlertDialog
           import androidx.appcompat.app.AppCompatActivity
           import androidx.core.app.ActivityCompat
           import androidx.core.content.ContextCompat
+          import kotlinx.coroutines.*
+          import java.io.ByteArrayOutputStream
 
           class MainActivity : AppCompatActivity() {
+
+              private val languages = listOf("Turkish", "Persian", "English", "Arabic", "Russian", "German", "French")
+              private val langCodes = mapOf(
+                  "Turkish" to "tr", "Persian" to "fa", "English" to "en",
+                  "Arabic" to "ar", "Russian" to "ru", "German" to "de", "French" to "fr"
+              )
+
+              private var sourceLang = "Turkish"
+              private var targetLang = "Persian"
+
+              private lateinit var etInput: EditText
+              private lateinit var cardResult: View
+              private lateinit var tvResult: TextView
+              private lateinit var btnSourceLang: TextView
+              private lateinit var btnTargetLang: TextView
+
+              private var mediaProjectionManager: MediaProjectionManager? = null
+
+              private val screenCaptureLauncher = registerForActivityResult(
+                  ActivityResultContracts.StartActivityForResult()
+              ) { result ->
+                  if (result.resultCode == RESULT_OK && result.data != null) {
+                      val mp = mediaProjectionManager?.getMediaProjection(result.resultCode, result.data!!)
+                      if (mp != null) {
+                          startInternalAudioCapture(mp)
+                      }
+                  } else {
+                      Toast.makeText(this, "دسترسی ضبط صدای داخلی تایید نشد", Toast.LENGTH_SHORT).show()
+                  }
+              }
+
               override fun onCreate(savedInstanceState: Bundle?) {
                   super.onCreate(savedInstanceState)
                   setContentView(R.layout.activity_main)
 
-                  val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
-                  val etApiKey = findViewById<EditText>(R.id.etApiKey)
-                  val btnSaveApiKey = findViewById<Button>(R.id.btnSaveApiKey)
-                  val btnStart = findViewById<Button>(R.id.btnStartFloating)
+                  mediaProjectionManager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
 
-                  etApiKey.setText(prefs.getString("gemini_api_key", ""))
+                  etInput = findViewById(R.id.etTranslateInput)
+                  cardResult = findViewById(R.id.cardResult)
+                  tvResult = findViewById(R.id.tvTranslationResult)
+                  btnSourceLang = findViewById(R.id.btnSourceLang)
+                  btnTargetLang = findViewById(R.id.btnTargetLang)
 
-                  btnSaveApiKey.setOnClickListener {
-                      val key = etApiKey.text.toString().trim()
-                      prefs.edit().putString("gemini_api_key", key).apply()
-                      Toast.makeText(this, "کلید با موفقیت در حافظه دستگاه ذخیره شد", Toast.LENGTH_SHORT).show()
+                  findViewById<View>(R.id.btnSettingsKey).setOnClickListener { showSettingsDialog() }
+                  findViewById<View>(R.id.btnPasteChip).setOnClickListener { handlePaste() }
+                  findViewById<View>(R.id.btnSwapLang).setOnClickListener { swapLanguages() }
+
+                  btnSourceLang.setOnClickListener { showLanguagePicker(true) }
+                  btnTargetLang.setOnClickListener { showLanguagePicker(false) }
+
+                  findViewById<View>(R.id.btnCopyResult).setOnClickListener {
+                      val clip = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                      clip.setPrimaryClip(ClipData.newPlainText("Translation", tvResult.text))
+                      Toast.makeText(this, "متن کپی شد", Toast.LENGTH_SHORT).show()
                   }
 
-                  btnStart.setOnClickListener {
-                      checkPermissionsAndStart()
+                  // دکمه باز کردن ویجت شناور
+                  findViewById<View>(R.id.btnToggleFloating).setOnClickListener {
+                      checkOverlayAndStartService()
+                  }
+
+                  // دکمه میکروفون فیزیکی (گفتار معمولی)
+                  findViewById<View>(R.id.btnMainMic).setOnClickListener {
+                      checkMicAndListen()
+                  }
+
+                  // دکمه صدای داخلی (فیلم، بازی و...)
+                  findViewById<View>(R.id.btnInternalAudio).setOnClickListener {
+                      requestInternalAudioCapture()
                   }
               }
 
-              private fun checkPermissionsAndStart() {
+              private fun handlePaste() {
+                  val clip = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                  val text = clip.primaryClip?.getItemAt(0)?.text?.toString() ?: ""
+                  if (text.isNotBlank()) {
+                      etInput.setText(text)
+                      performTranslation(text)
+                  } else {
+                      Toast.makeText(this, "متنی در حافظه کپی نشده است", Toast.LENGTH_SHORT).show()
+                  }
+              }
+
+              private fun performTranslation(text: String) {
+                  cardResult.visibility = View.VISIBLE
+                  tvResult.text = "در حال ترجمه..."
+                  val src = langCodes[sourceLang] ?: "auto"
+                  val trg = langCodes[targetLang] ?: "fa"
+                  CoroutineScope(Dispatchers.Main).launch {
+                      tvResult.text = TranslatorHelper.translate(text, src, trg)
+                  }
+              }
+
+              private fun swapLanguages() {
+                  val temp = sourceLang
+                  sourceLang = targetLang
+                  targetLang = temp
+                  btnSourceLang.text = sourceLang
+                  btnTargetLang.text = targetLang
+                  val currentText = etInput.text.toString().trim()
+                  if (currentText.isNotEmpty()) performTranslation(currentText)
+              }
+
+              private fun showLanguagePicker(isSource: Boolean) {
+                  AlertDialog.Builder(this)
+                      .setTitle("انتخاب زبان")
+                      .setItems(languages.toTypedArray()) { _, which ->
+                          if (isSource) {
+                              sourceLang = languages[which]
+                              btnSourceLang.text = sourceLang
+                          } else {
+                              targetLang = languages[which]
+                              btnTargetLang.text = targetLang
+                          }
+                      }.show()
+              }
+
+              private fun showSettingsDialog() {
+                  val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
+                  val currentKey = prefs.getString("gemini_api_key", "")
+
+                  val input = EditText(this).apply {
+                      hint = "AIzaSy..."
+                      setText(currentKey)
+                      setPadding(40, 30, 40, 30)
+                  }
+
+                  AlertDialog.Builder(this)
+                      .setTitle("تنظیم کلید Gemini API")
+                      .setMessage("برای ضبط صدای مستقیم فیلم و هوش مصنوعی، کلید رایگان Gemini خود را وارد کنید:")
+                      .setView(input)
+                      .setPositiveButton("ذخیره") { _, _ ->
+                          val key = input.text.toString().trim()
+                          prefs.edit().putString("gemini_api_key", key).apply()
+                          Toast.makeText(this, "کلید با موفقیت ذخیره شد", Toast.LENGTH_SHORT).show()
+                      }
+                      .setNegativeButton("انصراف", null)
+                      .show()
+              }
+
+              private fun checkOverlayAndStartService() {
                   if (!Settings.canDrawOverlays(this)) {
-                      val intent = Intent(
-                          Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                          Uri.parse("package:$packageName")
-                      )
-                      startActivity(intent)
-                      Toast.makeText(this, "دسترسی نمایش روی سایر برنامه‌ها را فعال کنید", Toast.LENGTH_LONG).show()
+                      startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName")))
+                      Toast.makeText(this, "لطفاً دسترسی شناور را فعال کنید", Toast.LENGTH_LONG).show()
                       return
                   }
                   if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                       ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 101)
                       return
                   }
-                  val serviceIntent = Intent(this, FloatingWidgetService::class.java)
+                  val intent = Intent(this, FloatingWidgetService::class.java)
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                      startForegroundService(serviceIntent)
+                      startForegroundService(intent)
                   } else {
-                      startService(serviceIntent)
+                      startService(intent)
                   }
-                  finish()
+                  Toast.makeText(this, "مترجم شناور فعال شد", Toast.LENGTH_SHORT).show()
+              }
+
+              private fun checkMicAndListen() {
+                  if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                      ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 102)
+                      return
+                  }
+                  val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                      putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+                      putExtra(RecognizerIntent.EXTRA_LANGUAGE, langCodes[sourceLang] ?: "tr")
+                  }
+                  val recognizer = SpeechRecognizer.createSpeechRecognizer(this)
+                  recognizer.setRecognitionListener(object : RecognitionListener {
+                      override fun onReadyForSpeech(params: Bundle?) {
+                          cardResult.visibility = View.VISIBLE
+                          tvResult.text = "در حال شنیدن گفتار شما..."
+                      }
+                      override fun onResults(results: Bundle?) {
+                          val heard = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.getOrNull(0) ?: ""
+                          if (heard.isNotEmpty()) {
+                              etInput.setText(heard)
+                              performTranslation(heard)
+                          }
+                      }
+                      override fun onError(error: Int) { tvResult.text = "صدایی دریافت نشد." }
+                      override fun onBeginningOfSpeech() {}
+                      override fun onRmsChanged(rmsdB: Float) {}
+                      override fun onBufferReceived(buffer: ByteArray?) {}
+                      override fun onEndOfSpeech() {}
+                      override fun onPartialResults(partialResults: Bundle?) {}
+                      override fun onEvent(eventType: Int, params: Bundle?) {}
+                  })
+                  recognizer.startListening(intent)
+              }
+
+              // ضبط صدای مستقیم از پردازنده صوتی گوشی
+              private fun requestInternalAudioCapture() {
+                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                      Toast.makeText(this, "ضبط صدای داخلی نیازمند اندروید ۱۰ به بالا است", Toast.LENGTH_LONG).show()
+                      return
+                  }
+                  val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
+                  val key = prefs.getString("gemini_api_key", "") ?: ""
+                  if (key.isBlank()) {
+                      Toast.makeText(this, "ابتدا کلید Gemini API را از چرخ‌دنده بالا ثبت کنید", Toast.LENGTH_LONG).show()
+                      return
+                  }
+                  screenCaptureLauncher.launch(mediaProjectionManager?.createScreenCaptureIntent())
+              }
+
+              @SuppressLint("MissingPermission")
+              private fun startInternalAudioCapture(mediaProjection: MediaProjection) {
+                  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+
+                  cardResult.visibility = View.VISIBLE
+                  tvResult.text = "🔊 در حال ضبط ۵ ثانیه از صدای داخلی گوشی (ویدیو/موزیک)..."
+
+                  CoroutineScope(Dispatchers.IO).launch {
+                      try {
+                          val sampleRate = 16000
+                          val channelConfig = AudioFormat.CHANNEL_IN_MONO
+                          val audioEncoding = AudioFormat.ENCODING_PCM_16BIT
+                          val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioEncoding) * 4
+
+                          val playbackConfig = AudioPlaybackCaptureConfiguration.Builder(mediaProjection)
+                              .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
+                              .addMatchingUsage(AudioAttributes.USAGE_GAME)
+                              .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
+                              .build()
+
+                          val audioRecord = AudioRecord.Builder()
+                              .setAudioPlaybackCaptureConfig(playbackConfig)
+                              .setAudioFormat(
+                                  AudioFormat.Builder()
+                                      .setEncoding(audioEncoding)
+                                      .setSampleRate(sampleRate)
+                                      .setChannelMask(channelConfig)
+                                      .build()
+                              )
+                              .setBufferSizeInBytes(bufferSize)
+                              .build()
+
+                          val outputStream = ByteArrayOutputStream()
+                          val buffer = ByteArray(bufferSize)
+                          audioRecord.startRecording()
+
+                          val startTime = System.currentTimeMillis()
+                          while (System.currentTimeMillis() - startTime < 5000) { // ضبط ۵ ثانیه‌ای
+                              val read = audioRecord.read(buffer, 0, buffer.size)
+                              if (read > 0) outputStream.write(buffer, 0, read)
+                          }
+
+                          audioRecord.stop()
+                          audioRecord.release()
+                          mediaProjection.stop()
+
+                          val wavData = TranslatorHelper.pcmToWav(outputStream.toByteArray(), sampleRate, 1)
+
+                          withContext(Dispatchers.Main) {
+                              tvResult.text = "🤖 هوش مصنوعی در حال تحلیل و ترجمه صدای فیلم..."
+                          }
+
+                          val prefs = getSharedPreferences("translator_prefs", Context.MODE_PRIVATE)
+                          val apiKey = prefs.getString("gemini_api_key", "") ?: ""
+                          val response = TranslatorHelper.transcribeAndTranslateInternalAudio(wavData, targetLang, apiKey)
+
+                          withContext(Dispatchers.Main) {
+                              tvResult.text = response
+                          }
+                      } catch (e: Exception) {
+                          withContext(Dispatchers.Main) {
+                              tvResult.text = "خطا در ضبط صدای داخلی: ${e.localizedMessage}"
+                          }
+                      }
+                  }
               }
           }
           EOF
 
-      # تایید لایسنس‌های اندروید
       - name: Accept Licenses
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
 
-      # ساخت APK
       - name: Build APK
         run: |
           gradle assembleDebug --no-daemon --stacktrace
 
-      # دانلود فایل نصبی
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Floating-Translator-AI-APK
+          name: Google-Translate-AI-APK
           path: app/build/outputs/apk/debug/app-debug.apk
